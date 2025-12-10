@@ -7,14 +7,14 @@ import (
 
 	"github.com/tuanta7/k6-demo/services/location/internal"
 	"github.com/tuanta7/k6-demo/services/location/internal/domain"
-	"github.com/tuanta7/k6-demo/services/location/pkg/adapter/rabbitmq"
+	"github.com/tuanta7/k6-demo/services/location/pkg/amqp"
 )
 
 type Handler struct {
-	consumer rabbitmq.Consumer
+	consumer amqp.Consumer
 }
 
-func NewHandler(consumer rabbitmq.Consumer) *Handler {
+func NewHandler(consumer amqp.Consumer) *Handler {
 	return &Handler{
 		consumer: consumer,
 	}
@@ -31,5 +31,5 @@ func (h *Handler) ConsumeNotification(ctx context.Context) error {
 		return nil
 	}
 
-	return h.consumer.Consume(ctx, internal.NotificationQueue, handler)
+	return h.consumer.Consume(ctx, internal.NotificationQueue, "", false, false, handler)
 }

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/tuanta7/k6-demo/services/location/internal/domain"
-	"github.com/tuanta7/k6-demo/services/location/pkg/adapter/redis"
+	"github.com/tuanta7/k6-demo/services/location/pkg/redis"
 )
 
 type Cache struct {
@@ -18,20 +18,26 @@ func NewCache(redis redis.Client) *Cache {
 	}
 }
 
-func (c *Cache) UpdateLocation(ctx context.Context, location *domain.Location) error {
-	b, err := c.redis.Get(ctx, location.TripID)
+func (c *Cache) Set(ctx context.Context, location *domain.Location) error {
+	return c.redis.Set(ctx, location.TripID, location, 0)
+}
+
+func (c *Cache) Get(ctx context.Context, tripID string) (*domain.Location, error) {
+	data, err := c.redis.Get(ctx, tripID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var l domain.Location
-	if err = json.Unmarshal(b, &l); err != nil {
-		return err
+	if err = json.Unmarshal(data, &l); err != nil {
+		return nil, err
 	}
 
-	if location.Timestamp.Before(l.Timestamp) {
-		return nil
+	location := &domain.Location{}
+	err = json.Unmarshal(data, location)
+	if err != nil {
+		return nil, err
 	}
 
-	return c.redis.Set(ctx, location.TripID, location, 0)
+	return location, nil
 }

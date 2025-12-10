@@ -19,15 +19,15 @@ WebSocket services are used to maintain a live feed of driver locations for both
 
 ### 2.2. Multi Servers Sticky-session 
 
-Sticky session, also known as session affinity is a load balancing strategy where a client consistently connects to the same server across a session or multiple reconnects. 
+Sticky session, also known as session affinity, is a load balancing strategy where a client consistently connects to the same server across a session or multiple reconnects. 
 
 ### 2.3. Fallback Transport Mechanisms
 
-Some clients, due to restrictive firewalls, proxies, or legacy environments won't be able to establish a WebSocket connection at all.
+Some clients, due to restrictive firewalls, proxies, or legacy environments, won't be able to establish a WebSocket connection at all.
 
 ## 3. Trip History Storage: ClickHouse
 
-A time-series/column oriented database like TimescaleDB (PostgreSQL extension) or ClickHouse is recommended. This storage pattern allows efficient historical queries for analytics or trip reconstruction.
+A time-series/column-oriented database like TimescaleDB (PostgreSQL extension) or ClickHouse is recommended. This storage pattern allows efficient historical queries for analytics or trip reconstruction.
 
 ## 4. Latest Location Storage: Redis
 
