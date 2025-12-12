@@ -1,4 +1,4 @@
-.env
+services/.env
 .vscode/
 .idea/
 

@@ -1,11 +1,7 @@
-# K6 Demo
-
-🚛 Location service demo with support for location tracking & push notifications.
+# Performance Testing with k6
 
 - Install k6: [Grafana Doc](https://grafana.com/docs/k6/latest/set-up/install-k6/)
 - Running k6: [Grafana Doc](https://grafana.com/docs/k6/latest/get-started/running-k6/)
-
-## NGINX
 
 ## SigNoz
 
