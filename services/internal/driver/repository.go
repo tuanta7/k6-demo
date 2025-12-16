@@ -3,8 +3,8 @@ package driver
 import (
 	"context"
 
-	"github.com/tuanta7/k6-demo/services/internal/domain"
-	"github.com/tuanta7/k6-demo/services/pkg/mongo"
+	"github.com/tuanta7/k6noz/services/internal/domain"
+	"github.com/tuanta7/k6noz/services/pkg/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

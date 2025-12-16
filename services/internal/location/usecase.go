@@ -3,7 +3,7 @@ package location
 import (
 	"context"
 
-	"github.com/tuanta7/k6-demo/services/internal/domain"
+	"github.com/tuanta7/k6noz/services/internal/domain"
 )
 
 type UseCase struct {

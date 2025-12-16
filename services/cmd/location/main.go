@@ -6,8 +6,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 	goredis "github.com/redis/go-redis/v9"
-	"github.com/tuanta7/k6-demo/services/pkg/redis"
-	"github.com/tuanta7/k6-demo/services/pkg/zapx"
+	"github.com/tuanta7/k6noz/services/pkg/redis"
+	"github.com/tuanta7/k6noz/services/pkg/zapx"
 )
 
 func main() {

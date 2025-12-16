@@ -1,4 +1,4 @@
-# Location
+# Monorepo for Location Services
 
 🚛 Location service demo with support for location tracking & push notifications.
 

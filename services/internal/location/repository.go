@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/tuanta7/k6-demo/services/internal/domain"
-	"github.com/tuanta7/k6-demo/services/pkg/redis"
+	"github.com/tuanta7/k6noz/services/internal/domain"
+	"github.com/tuanta7/k6noz/services/pkg/redis"
 )
 
 type Repository struct {

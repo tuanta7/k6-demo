@@ -3,8 +3,8 @@ package notification
 import (
 	"context"
 
-	"github.com/tuanta7/k6-demo/services/internal"
-	"github.com/tuanta7/k6-demo/services/pkg/amqp"
+	"github.com/tuanta7/k6noz/services/internal"
+	"github.com/tuanta7/k6noz/services/pkg/amqp"
 )
 
 type Consumer struct {

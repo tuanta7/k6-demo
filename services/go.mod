@@ -1,4 +1,4 @@
-module github.com/tuanta7/k6-demo/services
+module github.com/tuanta7/k6noz/services
 
 go 1.25.3
 
