@@ -1,0 +1,49 @@
+receivers: # Receivers define how the collector receives telemetry data
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317 # gRPC endpoint for OTLP receiver
+      http:
+        endpoint: 0.0.0.0:4318  # HTTP endpoint for OTLP receiver
+
+processors: # Processors modify or batch data before exporting
+  batch:  # Batches data for efficiency
+    send_batch_size: 10000
+    send_batch_max_size: 11000
+
+exporters: # Exporters send processed data to a destination
+  otlp:  # OTLP exporter sends data to another collector or backend (SigNoz, Jaeger, etc.)
+    endpoint: host.docker.internal:4317
+    insecure: true
+  otlp/http:
+    endpoint: host.docker.internal:4318
+    insecure: true
+  clickhouse:
+    endpoint: tcp://clickhouse:9000
+    username: signoz
+    password: password
+    database: signoz_traces
+    ttl_days: 3
+
+
+extensions: # Extensions add optional features to the collector
+  health_check:
+    endpoint: 0.0.0.0:13133
+  pprof:
+    endpoint: 0.0.0.0:1777  # Performance profiling endpoint
+
+service: # Service configures the main collector service
+  extensions: [health_check, pprof, zpages]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [clickhouse,otlp]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [clickhouse,otlp]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [clickhouse,otlp]
