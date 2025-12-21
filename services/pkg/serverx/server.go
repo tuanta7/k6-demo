@@ -1,8 +1,7 @@
-package server
+package serverx
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -16,16 +15,15 @@ type Server interface {
 	Shutdown(context.Context) error
 }
 
-func RunServers(servers []Server, gracePeriod ...time.Duration) error {
+func RunServer(server Server, gracePeriod ...time.Duration) error {
 	errCh := make(chan error)
-	for _, server := range servers {
-		go func(s Server) {
-			if err := s.Run(); err != nil {
-				err = fmt.Errorf("error starting REST server: %w", err)
-				errCh <- err
-			}
-		}(server)
-	}
+
+	go func(s Server) {
+		if err := s.Run(); err != nil {
+			err = fmt.Errorf("error starting REST server: %w", err)
+			errCh <- err
+		}
+	}(server)
 
 	notifyCh := make(chan os.Signal, 1)
 	signal.Notify(notifyCh, syscall.SIGINT, syscall.SIGTERM)
@@ -33,15 +31,15 @@ func RunServers(servers []Server, gracePeriod ...time.Duration) error {
 	select {
 	case err := <-errCh:
 		log.Println("Shutting down due to server error:", err)
-		return shutdownServer(servers, gracePeriod...)
+		return shutdownServer(server, gracePeriod...)
 	case <-notifyCh:
 		log.Println("Shutting down gracefully...")
-		_ = shutdownServer(servers, gracePeriod...)
+		_ = shutdownServer(server, gracePeriod...)
 		return nil
 	}
 }
 
-func shutdownServer(servers []Server, gracePeriod ...time.Duration) (err error) {
+func shutdownServer(server Server, gracePeriod ...time.Duration) error {
 	timeout := 30 * time.Second
 	if len(gracePeriod) > 0 {
 		timeout = gracePeriod[0]
@@ -50,14 +48,9 @@ func shutdownServer(servers []Server, gracePeriod ...time.Duration) (err error) 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	for _, server := range servers {
-		if se := server.Shutdown(shutdownCtx); se != nil {
-			log.Println("Error during server shutdown:", se)
-			err = errors.Join(err, se)
-		}
-	}
-
+	err := server.Shutdown(shutdownCtx)
 	if err != nil {
+		log.Println("Error during server shutdown:", err)
 		return err
 	}
 

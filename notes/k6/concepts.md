@@ -5,14 +5,4 @@
 
 ## 1. Concepts
 
-## 2.  
-
-## Appendix: APT (Advanced Package Tool)
-
-`apt` and `apt-get` are components of the APT (Advanced Package Tool) ecosystem used on Debian and Ubuntu distributions.
-
-### Repository Index Retrieval
-
-When apt update or apt-get update is executed, the following sequence occurs
-
-- Entries in `/etc/apt/sources.list` and the files under `/etc/apt/sources.list.d/` are parsed.
+## 2.

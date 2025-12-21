@@ -1,12 +1,12 @@
 package domain
 
-type MessageChannel string
+type DriverLocation struct {
+	TripID   string    `json:"tripId"`
+	DriverID string    `json:"driverId"`
+	Location *Location `json:"location"`
+}
 
-const (
-	EmailChannel MessageChannel = "email"
-	PushChannel  MessageChannel = "push"
-)
-
-type Message struct {
-	Channel MessageChannel `json:"channel"`
+type TripConfirmation struct {
+	PassengerID string    `json:"passengerId"`
+	Location    *Location `json:"location"`
 }

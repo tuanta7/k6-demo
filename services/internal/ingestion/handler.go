@@ -1,33 +1,59 @@
 package ingestion
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/websocket"
-	"github.com/labstack/echo/v4"
+	"github.com/tuanta7/k6noz/services/internal/domain"
 	"github.com/tuanta7/k6noz/services/pkg/kafka"
+	"github.com/tuanta7/k6noz/services/pkg/zapx"
+	"go.uber.org/zap"
 )
 
 type Handler struct {
 	publisher kafka.Publisher
+	logger    *zapx.Logger
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(logger *zapx.Logger) *Handler {
+	return &Handler{
+		logger: logger,
+	}
 }
 
 var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
-		return true // Allow all origins in development
+		return true
 	},
 }
 
-func (h *Handler) HandleWS(c echo.Context) error {
-	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+func (h *Handler) HandleWS(w http.ResponseWriter, r *http.Request) {
+	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		return err
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 	defer ws.Close()
 
-	return nil
+	for {
+		_, msg, err := ws.ReadMessage()
+		if err != nil {
+			h.logger.Error("ws read error", zap.Error(err))
+			break
+		}
+
+		var location domain.DriverLocation
+		if err := json.Unmarshal(msg, &location); err != nil {
+			h.logger.Error("invalid payload", zap.Error(err))
+			continue
+		}
+
+		if err := h.publisher.Publish(r.Context(), domain.DriverLocationTopic, msg); err != nil {
+			h.logger.Error("publish error", zap.Error(err))
+			continue
+		}
+	}
 }

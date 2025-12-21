@@ -10,7 +10,7 @@ type Logger struct {
 
 func NewLogger() (*Logger, error) {
 	cfg := zap.NewProductionConfig()
-	cfg.Encoding = "console"
+	cfg.Encoding = "json"
 
 	zl, err := cfg.Build(
 		zap.AddCaller(),
