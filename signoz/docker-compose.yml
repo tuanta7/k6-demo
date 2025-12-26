@@ -10,7 +10,7 @@ x-common: &common
 x-clickhouse-defaults: &clickhouse-defaults
   !!merge <<: *common
   # adding non-LTS version due to this fix https://github.com/ClickHouse/ClickHouse/commit/32caf8716352f45c1b617274c7508c86b7d1afab
-  image: clickhouse/clickhouse-server:latest-alpine
+  image: clickhouse/clickhouse-server:25.5.6
   tty: true
   labels:
     signoz.io/scrape: "true"
@@ -34,7 +34,7 @@ x-clickhouse-defaults: &clickhouse-defaults
 
 x-zookeeper-defaults: &zookeeper-defaults
   !!merge <<: *common
-  image: signoz/zookeeper:3.7.1 # bitnami is no longer free
+  image: signoz/zookeeper:3.7.1
   user: root
   labels:
     signoz.io/scrape: "true"
@@ -57,7 +57,7 @@ x-db-depend: &db-depend
 services:
   init-clickhouse:
     !!merge <<: *common
-    image: clickhouse/clickhouse-server:latest-alpine
+    image: clickhouse/clickhouse-server:25.5.6
     container_name: signoz-init-clickhouse
     command:
       - bash
@@ -99,7 +99,6 @@ services:
       - "8123:8123"
       - "9181:9181"
     volumes:
-      - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml
       - ./clickhouse/cluster.xml:/etc/clickhouse-server/config.d/cluster.xml
       - ./clickhouse/custom-function.xml:/etc/clickhouse-server/custom-function.xml
       - ./clickhouse/user_scripts:/var/lib/clickhouse/user_scripts/
@@ -110,7 +109,7 @@ services:
 
   signoz:
     !!merge <<: *db-depend
-    image: signoz/signoz:latest
+    image: signoz/signoz:v0.105.1
     container_name: signoz
     command:
       - --config=/root/config/prometheus.yml
@@ -139,7 +138,7 @@ services:
 
   otel-collector:
     !!merge <<: *db-depend
-    image: signoz/signoz-otel-collector:latest
+    image: signoz/signoz-otel-collector:v0.129.12
     container_name: signoz-otel-collector
     command:
       - --config=/etc/otel-collector-config.yaml
@@ -162,7 +161,7 @@ services:
 
   schema-migrator-sync:
     !!merge <<: *common
-    image: signoz/signoz-schema-migrator:latest
+    image: signoz/signoz-schema-migrator:v0.129.12
     container_name: schema-migrator-sync
     command:
       - sync
@@ -175,7 +174,7 @@ services:
 
   schema-migrator-async:
     !!merge <<: *db-depend
-    image: signoz/signoz-schema-migrator:latest
+    image: signoz/signoz-schema-migrator:v0.129.12
     container_name: schema-migrator-async
     command:
       - async

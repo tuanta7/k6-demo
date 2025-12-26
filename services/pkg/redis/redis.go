@@ -2,63 +2,44 @@ package redis
 
 import (
 	"context"
-	"time"
 
 	goredis "github.com/redis/go-redis/v9"
 )
 
-type Client struct {
-	cc *goredis.ClusterClient
+type Config struct {
+	MasterName    string
+	Username      string
+	Password      string
+	SentinelAddrs []string
 }
 
-func NewClusterClient(ctx context.Context, opts *goredis.FailoverOptions) (*Client, error) {
-	c := goredis.NewFailoverClusterClient(opts)
+type Client struct {
+	redisClient *goredis.Client
+}
+
+func NewClient(ctx context.Context, config *Config, opts ...Option) (*Client, error) {
+	client := &Client{}
+
+	c := goredis.NewFailoverClient(&goredis.FailoverOptions{
+		MasterName:    config.MasterName,
+		SentinelAddrs: config.SentinelAddrs,
+		Username:      config.Username,
+		Password:      config.Password,
+	})
 	if err := c.Ping(ctx).Err(); err != nil {
 		return nil, err
 	}
 
-	return &Client{c}, nil
-}
-
-func (c *Client) Exists(ctx context.Context, key ...string) (int64, error) {
-	result := c.cc.Exists(ctx, key...)
-	if err := result.Err(); err != nil {
-		return 0, err
+	client.redisClient = c
+	for _, opt := range opts {
+		if err := opt(client); err != nil {
+			return nil, err
+		}
 	}
 
-	return result.Val(), nil
-}
-
-func (c *Client) Get(ctx context.Context, key string) ([]byte, error) {
-	result := c.cc.Get(ctx, key)
-	if err := result.Err(); err != nil {
-		return nil, err
-	}
-
-	return result.Bytes()
-}
-
-func (c *Client) Set(ctx context.Context, key string, value any, expiration time.Duration) error {
-	return c.cc.Set(ctx, key, value, expiration).Err()
-}
-
-func (c *Client) Del(ctx context.Context, keys ...string) error {
-	return c.cc.Del(ctx, keys...).Err()
-}
-
-func (c *Client) MGet(ctx context.Context, keys ...string) ([]any, error) {
-	result := c.cc.MGet(ctx, keys...)
-	if err := result.Err(); err != nil {
-		return nil, err
-	}
-
-	return result.Result()
-}
-
-func (c *Client) MSet(ctx context.Context, pairs ...any) error {
-	return c.cc.MSet(ctx, pairs...).Err()
+	return client, nil
 }
 
 func (c *Client) Close() error {
-	return c.cc.Close()
+	return c.redisClient.Close()
 }

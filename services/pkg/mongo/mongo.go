@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
+	"go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/v2/mongo/otelmongo"
 )
 
 type Config struct {
@@ -31,11 +32,13 @@ func NewClient(ctx context.Context, cfg *Config) (*Client, error) {
 
 	opts := options.Client().
 		ApplyURI(cfg.URI).
+		SetConnectTimeout(cfg.ConnectTimeout).
 		SetMaxPoolSize(cfg.MaxPoolSize).
 		SetMinPoolSize(cfg.MinPoolSize).
-		SetConnectTimeout(cfg.ConnectTimeout)
+		SetConnectTimeout(cfg.ConnectTimeout).
+		SetMonitor(otelmongo.NewMonitor())
 
-	client, err := mongo.Connect(ctx, opts)
+	client, err := mongo.Connect(opts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to mongodb: %w", err)
 	}

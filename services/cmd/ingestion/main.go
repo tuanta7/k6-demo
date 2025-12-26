@@ -8,16 +8,16 @@ import (
 )
 
 func main() {
+	cfg, err := ingestion.LoadConfig()
+	if err != nil {
+		panic(err)
+	}
+
 	logger, err := zapx.NewLogger()
 	if err != nil {
 		panic(err)
 	}
 	defer logger.Close()
-
-	cfg, err := ingestion.LoadConfig()
-	if err != nil {
-		panic(err)
-	}
 
 	handler := ingestion.NewHandler(logger)
 	server := ingestion.NewServer(cfg, handler)

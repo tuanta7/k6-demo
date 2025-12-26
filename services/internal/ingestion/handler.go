@@ -41,7 +41,7 @@ func (h *Handler) HandleWS(w http.ResponseWriter, r *http.Request) {
 	for {
 		_, msg, err := ws.ReadMessage()
 		if err != nil {
-			h.logger.Error("ws read error", zap.Error(err))
+			h.logger.Error("websocket read error", zap.Error(err))
 			break
 		}
 
@@ -51,7 +51,8 @@ func (h *Handler) HandleWS(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		if err := h.publisher.Publish(r.Context(), domain.DriverLocationTopic, msg); err != nil {
+		key := []byte(location.DriverID)
+		if err := h.publisher.Publish(r.Context(), domain.DriverLocationTopic, key, msg); err != nil {
 			h.logger.Error("publish error", zap.Error(err))
 			continue
 		}
