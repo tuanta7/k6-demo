@@ -41,7 +41,7 @@ func NewMonitor(serviceName, collectorAddr string, prometheus *PrometheusProvide
 }
 
 func (m *Monitor) SetupOtelSDK(ctx context.Context) error {
-	msf, err := m.initTracerProvider(ctx)
+	msf, err := m.initMeterProvider(ctx)
 	if err != nil {
 		return err
 	}

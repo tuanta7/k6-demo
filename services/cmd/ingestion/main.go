@@ -28,11 +28,7 @@ func main() {
 	prometheus, err := otelx.NewPrometheusProvider()
 	panicOnErr(err)
 
-	monitor, err := otelx.NewMonitor(
-		"github.com/tuanta7/k6noz/ingestion",
-		"",
-		prometheus,
-	)
+	monitor, err := otelx.NewMonitor(cfg.OTelServiceName, cfg.OTelGRPCEndpoint, prometheus)
 	panicOnErr(err)
 	defer slient.CloseWithContext(monitor, ctx)
 

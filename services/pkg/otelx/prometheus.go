@@ -15,13 +15,8 @@ type PrometheusProvider struct {
 }
 
 func NewPrometheusProvider(cs ...prometheus.Collector) (*PrometheusProvider, error) {
-	cs = append(cs,
-		collectors.NewGoCollector(),
-		//collectors.NewBuildInfoCollector(),
-		//collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
-	)
-
 	registry := prometheus.NewRegistry()
+	registry.MustRegister(collectors.NewGoCollector())
 	registry.MustRegister(cs...)
 
 	exporter, err := otelprom.New(

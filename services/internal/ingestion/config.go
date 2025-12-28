@@ -8,8 +8,10 @@ import (
 const ConfigPrefix = "INGESTION"
 
 type Config struct {
-	BindAddress string      `envconfig:"BIND_ADDRESS" required:"true"`
-	Kafka       KafkaConfig `envconfig:"KAFKA"`
+	BindAddress      string      `envconfig:"BIND_ADDRESS" required:"true"`
+	OTelGRPCEndpoint string      `envconfig:"OTEL_GRPC_ENDPOINT" required:"true"`
+	OTelServiceName  string      `envconfig:"OTEL_SERVICE_NAME" required:"true" default:"ingestion-service"`
+	Kafka            KafkaConfig `envconfig:"KAFKA"`
 }
 
 type KafkaConfig struct {

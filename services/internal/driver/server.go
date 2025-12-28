@@ -3,15 +3,18 @@ package driver
 import (
 	"context"
 	"net/http"
+
+	"github.com/tuanta7/k6noz/services/pkg/otelx"
 )
 
 type Server struct {
-	mux     *http.ServeMux
-	server  *http.Server
-	handler *Handler
+	mux        *http.ServeMux
+	server     *http.Server
+	handler    *Handler
+	prometheus *otelx.PrometheusProvider
 }
 
-func NewServer(addr string, handler *Handler) *Server {
+func NewServer(addr string, handler *Handler, prometheus *otelx.PrometheusProvider) *Server {
 	mux := http.NewServeMux()
 	server := &http.Server{
 		Addr:    addr,
@@ -19,15 +22,17 @@ func NewServer(addr string, handler *Handler) *Server {
 	}
 
 	return &Server{
-		mux:     mux,
-		server:  server,
-		handler: handler,
+		mux:        mux,
+		server:     server,
+		handler:    handler,
+		prometheus: prometheus,
 	}
 }
 
 func (s *Server) Run() error {
-	s.mux.HandleFunc("GET /drivers/{id}", s.handler.GetDriverByID)
-	s.mux.HandleFunc("POST /ratings", s.handler.CreateNewRating)
+	s.mux.Handle("GET /metrics", s.prometheus.Handler())
+	s.mux.Handle("GET /drivers/{id}", otelx.Handler(s.handler.GetDriverByID, "GetDriverByID"))
+	s.mux.Handle("POST /ratings", otelx.Handler(s.handler.CreateNewRating, "CreateNewRating"))
 	return s.server.ListenAndServe()
 }
 

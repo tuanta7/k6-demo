@@ -19,24 +19,24 @@ type CollectionClient struct {
 }
 
 func (c *CollectionClient) FindOne(ctx context.Context, filter any, result any) error {
-	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	timeoutCtx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
 
-	return c.collection.FindOne(ctx, filter).Decode(result)
+	return c.collection.FindOne(timeoutCtx, filter).Decode(result)
 }
 
 func (c *CollectionClient) InsertOne(ctx context.Context, document any) error {
-	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	timeoutCtx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
 
-	_, err := c.collection.InsertOne(ctx, document)
+	_, err := c.collection.InsertOne(timeoutCtx, document)
 	return err
 }
 
 func (c *CollectionClient) UpdateOne(ctx context.Context, filter any, update any) error {
-	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	timeoutCtx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
 
-	_, err := c.collection.UpdateOne(ctx, filter, update)
+	_, err := c.collection.UpdateOne(timeoutCtx, filter, update)
 	return err
 }

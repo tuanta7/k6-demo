@@ -68,7 +68,7 @@ processors:
     send_batch_size: 10000
     # Maximum batch size (prevents memory issues)
     send_batch_max_size: 11000
-    # Maximum time to wait before sending (even if batch isn't full)
+    # Maximum time to wait before sending (even if the batch isn't full)
     timeout: 10s
 
   # Separate batch processor for metering data with different settings
@@ -97,9 +97,9 @@ processors:
     # Histogram buckets for latency measurements (in various time units)
     # Helps visualize latency distribution (p50, p90, p99, etc.)
     latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms, 50ms, 100ms, 250ms, 500ms, 1000ms, 1400ms, 2000ms, 5s, 10s, 20s, 40s, 60s ]
-    # Cache size for dimension combinations (memory vs accuracy tradeoff)
+    # Cache size for dimension combinations (memory vs. accuracy tradeoff)
     dimensions_cache_size: 100000
-    # Delta = only send changes since last export (more efficient)
+    # Delta = only send changes since the last export (more efficient)
     # Cumulative = send total counts each time
     aggregation_temporality: AGGREGATION_TEMPORALITY_DELTA
     # Enable exponential histograms for better precision
@@ -153,7 +153,7 @@ exporters:
   # ClickHouse is a fast columnar database, great for analytics.
   clickhousetraces:
     # Connection string: tcp://host:port/database
-    datasource: tcp://clickhouse:9000/signoz_traces
+    datasource: tcp://default:password@clickhouse:9000/signoz_traces
     # Group exceptions by type rather than message (reduces cardinality)
     low_cardinal_exception_grouping: ${env:LOW_CARDINAL_EXCEPTION_GROUPING}
     # Use newer, more efficient schema
@@ -162,12 +162,12 @@ exporters:
   # SigNoz ClickHouse Metrics Exporter
   # Sends metrics data to ClickHouse for storage.
   signozclickhousemetrics:
-    dsn: tcp://clickhouse:9000/signoz_metrics
+    dsn: tcp://default:password@clickhouse:9000/signoz_metrics
 
   # ClickHouse Logs Exporter
   # Sends log data to ClickHouse for storage.
   clickhouselogsexporter:
-    dsn: tcp://clickhouse:9000/signoz_logs
+    dsn: tcp://default:password@clickhouse:9000/signoz_logs
     # Timeout for write operations
     timeout: 10s
     use_new_schema: true
@@ -176,7 +176,7 @@ exporters:
   # Sends usage metering data to ClickHouse.
   # This tracks how much telemetry each service is generating.
   signozclickhousemeter:
-    dsn: tcp://clickhouse:9000/signoz_meter
+    dsn: tcp://default:password@clickhouse:9000/signoz_meter
     timeout: 45s
     sending_queue:
       # Disable async sending queue (send synchronously)

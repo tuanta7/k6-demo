@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/tuanta7/k6noz/services/internal/driver"
 	"github.com/tuanta7/k6noz/services/pkg/mongo"
 	"github.com/tuanta7/k6noz/services/pkg/otelx"
@@ -25,7 +26,10 @@ func main() {
 	slient.PanicOnErr(err, "failed to create logger")
 	defer slient.Close(logger)
 
-	prometheus, err := otelx.NewPrometheusProvider()
+	prometheus, err := otelx.NewPrometheusProvider(
+		collectors.NewBuildInfoCollector(),
+		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
+	)
 	slient.PanicOnErr(err)
 
 	monitor, err := otelx.NewMonitor(cfg.OTelServiceName, cfg.OTelGRPCEndpoint, prometheus)
@@ -49,7 +53,7 @@ func main() {
 	uc := driver.NewUseCase(logger, repo)
 	handler := driver.NewHandler(logger, uc)
 
-	server := driver.NewServer(cfg.BindAddress, handler)
+	server := driver.NewServer(cfg.BindAddress, handler, prometheus)
 	err = serverx.RunServer(server)
 	slient.PanicOnErr(err)
 	defer func(server *driver.Server, ctx context.Context) {
