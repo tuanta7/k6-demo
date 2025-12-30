@@ -103,7 +103,7 @@ func (m *Monitor) initMeterProvider(ctx context.Context) (ShutdownFn, error) {
 	if m.prometheus != nil {
 		reader = m.prometheus.Exporter()
 	} else {
-		reader = sdkmetric.NewPeriodicReader(otlpExporter, sdkmetric.WithInterval(5*time.Second))
+		reader = sdkmetric.NewPeriodicReader(otlpExporter)
 	}
 
 	meterProvider := sdkmetric.NewMeterProvider(
